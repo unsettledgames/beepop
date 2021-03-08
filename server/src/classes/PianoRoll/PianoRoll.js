@@ -1,7 +1,9 @@
 import VisualComponent from "../Abstracts/VisualComponent";
 
-export default class PianoRoll extends VisualComponent {
+export default class _PianoRoll extends VisualComponent {
     constructor() {
+        super();
+        
         this.currentNoteData = undefined;
         this.currentPhysicalNotes = undefined;
     
@@ -17,3 +19,5 @@ export default class PianoRoll extends VisualComponent {
         
     }
 }
+
+const PianoRoll = new _PianoRoll();

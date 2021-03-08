@@ -1,7 +1,9 @@
 import VisualComponent from "../Abstracts/VisualComponent";
 
-export default class PatternMenu extends VisualComponent {
+export default class _PatternMenu extends VisualComponent {
     constructor() {
+        super();
+
         this.patterns = undefined;
         this.currentPattern = undefined;
         this.allInstruments = null;
@@ -59,3 +61,5 @@ export default class PatternMenu extends VisualComponent {
         
     }
 }
+
+const PatternMenu = new _PatternMenu();
