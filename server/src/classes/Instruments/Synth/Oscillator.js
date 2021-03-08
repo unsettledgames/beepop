@@ -1,3 +1,5 @@
+import {audioContext} from "../../../consts/Globals";
+
 export const WaveShapes = {
     Sine: new WaveShape("sine"),
     Triangle: new WaveShape("triangle"),
@@ -14,8 +16,8 @@ export default class WaveShape {
 }
 
 export default class Oscillator {
-    constructor(index) {
-        this.osc = undefined;
+    constructor(index, startVolume) {
+        this.osc = audioContext.createOscillator();
         this.htmlElement = undefined;
         this.oscIndex = index;
 
@@ -24,9 +26,19 @@ export default class Oscillator {
         this.detune = 0;
         this.phase = 0.5;
         this.pan = 0.5;
-        this.volume = 1;
+        this.volume = startVolume;
 
         this.octaveOffset = 0;
         this.semitoneOffset = 0;
+        
+        init();
+    }
+
+    init() {
+        this.osc.connect(audioContext.destination);
+    }
+
+    playNote(toPlay) {
+        this.osc.start();
     }
 }

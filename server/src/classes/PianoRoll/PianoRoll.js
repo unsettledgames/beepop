@@ -1,6 +1,6 @@
 import VisualComponent from "../Abstracts/VisualComponent";
 
-export default class _PianoRoll extends VisualComponent {
+class _PianoRoll extends VisualComponent {
     constructor() {
         super();
         
@@ -20,4 +20,4 @@ export default class _PianoRoll extends VisualComponent {
     }
 }
 
-const PianoRoll = new _PianoRoll();
+export const PianoRoll = new _PianoRoll();

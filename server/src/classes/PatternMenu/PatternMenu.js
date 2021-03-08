@@ -1,6 +1,6 @@
 import VisualComponent from "../Abstracts/VisualComponent";
 
-export default class _PatternMenu extends VisualComponent {
+class _PatternMenu extends VisualComponent {
     constructor() {
         super();
 
@@ -62,4 +62,4 @@ export default class _PatternMenu extends VisualComponent {
     }
 }
 
-const PatternMenu = new _PatternMenu();
+export const PatternMenu = new _PatternMenu();

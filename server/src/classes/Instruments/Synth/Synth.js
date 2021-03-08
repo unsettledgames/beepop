@@ -1,6 +1,7 @@
 import Instrument from "../Instrument";
 import {MaxVoices} from "../../../config/SynthConfig";
 import {MaxOscillators} from "../../../config/SynthConfig";
+import EventBus from "../../Input/EventBus";
 import Oscillator from "./Oscillator";
 
 export default class Synth extends Instrument {
@@ -22,7 +23,28 @@ export default class Synth extends Instrument {
 
         // Creating the oscillators
         for (let i=0; i<MaxOscillators; i++) {
-            this.oscillators.push(new Oscillator(i));
+            if (i == 0) {
+                this.oscillators.push(new Oscillator(i), 1)
+            }
+            else {
+                this.oscillators.push(new Oscillator(i), 0);
+            }
+        }
+
+        bindListeners();
+    }
+
+    bindListeners() {
+        //EventBus.on()
+    }
+
+    /** Plays a note
+     * 
+     * @param {NoteData} toPlay The data of the note that should be played
+     */
+    playNote(toPlay) {
+        for (let i=0; i<this.oscillators.length; i++) {
+            this.oscillators[i].playNote(toPlay);
         }
     }
 
@@ -38,3 +60,8 @@ export default class Synth extends Instrument {
         
     }
 }
+
+console.log("suono");
+const debugSynth = new Synth();
+
+debugSynth.playNote(new NoteData());
