@@ -22,16 +22,16 @@ export default class Synth extends Instrument {
         this.automations = [];
 
         // Creating the oscillators
-        for (let i=0; i<MaxOscillators; i++) {
+        for (let i=0; i<4; i++) {
             if (i == 0) {
-                this.oscillators.push(new Oscillator(i), 1)
+                this.oscillators.push(new Oscillator(i, 0.7));
             }
             else {
-                this.oscillators.push(new Oscillator(i), 0);
+                this.oscillators.push(new Oscillator(i, 0));
             }
         }
 
-        bindListeners();
+        this.bindListeners();
     }
 
     bindListeners() {
@@ -60,8 +60,3 @@ export default class Synth extends Instrument {
         
     }
 }
-
-console.log("suono");
-const debugSynth = new Synth();
-
-debugSynth.playNote(new NoteData());

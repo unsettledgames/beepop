@@ -1,5 +1,3 @@
-import VisualComponent from "../Abstracts/VisualComponent";
-
 export default class Pattern {
     constructor() {
         this.usedInstruments = undefined;

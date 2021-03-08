@@ -1,5 +1,11 @@
 import {audioContext} from "../../../consts/Globals";
 
+export class WaveShape {
+    constructor(name) {
+        this.name = name;
+    }
+}
+
 export const WaveShapes = {
     Sine: new WaveShape("sine"),
     Triangle: new WaveShape("triangle"),
@@ -9,11 +15,6 @@ export const WaveShapes = {
     Pulse: new WaveShape("pulse")
 }
 
-export default class WaveShape {
-    constructor(name) {
-        this.name = name;
-    }
-}
 
 export default class Oscillator {
     constructor(index, startVolume) {
@@ -23,19 +24,32 @@ export default class Oscillator {
 
         this.waveShape = WaveShape.Sine;
 
+        // Oscillator properties
         this.detune = 0;
         this.phase = 0.5;
         this.pan = 0.5;
         this.volume = startVolume;
 
+        // Note properties
         this.octaveOffset = 0;
         this.semitoneOffset = 0;
+
+        // Nodes
+        this.gainNode = undefined;
         
-        init();
+        // Bind the init function and initialize the oscillator
+        this.init = this.init.bind(this);
+        
+        this.init();
     }
 
     init() {
-        this.osc.connect(audioContext.destination);
+        // Setting up the gain node
+        this.gainNode = audioContext.createGain();
+        this.gainNode.gain.value = this.volume;
+
+        this.osc.connect(this.gainNode);
+        this.gainNode.connect(audioContext.destination);
     }
 
     playNote(toPlay) {
