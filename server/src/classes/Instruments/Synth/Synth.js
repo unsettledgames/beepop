@@ -3,6 +3,7 @@ import {MaxVoices} from "../../../config/SynthConfig";
 import {MaxOscillators} from "../../../config/SynthConfig";
 import EventBus from "../../Input/EventBus";
 import Oscillator from "./Oscillator";
+import {getNoteFrequency} from "../../PianoRoll/NoteData";
 
 export default class Synth extends Instrument {
     constructor() {
@@ -30,6 +31,11 @@ export default class Synth extends Instrument {
                 this.oscillators.push(new Oscillator(i, 0));
             }
         }
+
+        console.log("C#5: " + getNoteFrequency("c#5"));
+        console.log("Bb3: " + getNoteFrequency("Bb3"));
+        console.log("A-6: " + getNoteFrequency("A-6"));
+        console.log("G#4: " + getNoteFrequency("G#4"));
 
         this.bindListeners();
     }
