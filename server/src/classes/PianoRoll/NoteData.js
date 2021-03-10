@@ -21,7 +21,7 @@ export function getNoteFrequency(noteName) {
     let octave = noteName.charAt(2);
 
     let octaveDifference = Math.abs(octave - 4);
-    let toneDifference;
+    let semitoneDifference;
     let sign;
     
     // Normally, notes go from B to A, instead we're going from C to B because
@@ -29,18 +29,42 @@ export function getNoteFrequency(noteName) {
     
     // If the note is B, there's only a tone of difference
     if (note.charCodeAt(0) == 'B'.charCodeAt(0)) {
-        toneDifference = 1;
-
         // Going up or down?
-        if (octave >= 4) 
+        if (octave >= 4) {
             sign = 1;
-        else 
+            semitoneDifference = 2;
+        }
+        else {
             sign = -1;
+            semitoneDifference = -2;
+        }
     }
     // Otherwise, I can't do A - G for example, so I pretend A is H 
     // to get the correct distance
     else {
-        toneDifference = 'H'.charCodeAt(0) - note.charCodeAt(0);
+        switch (note) {
+            case 'C':
+                semitoneDifference = -9;
+                break;
+            case 'D':
+                semitoneDifference = -7;
+                break;
+            case 'E':
+                semitoneDifference = -5;
+                break;
+            case 'F':
+                semitoneDifference = -4;
+                break;
+            case 'G':
+                semitoneDifference = -2;
+                break;
+            case 'A':
+                semitoneDifference = 0;
+                break;
+            default:
+                console.log("NOTE " + note + " NOT FOUND");
+                break;
+        }
 
         // Going up or down?
         if (octave > 4) 
@@ -57,14 +81,11 @@ export function getNoteFrequency(noteName) {
             modifierDifference = 0;
             break;
         case '#':
-            modifierDifference = 1;
-            break;
-        case 'b':
-            modifierDifference = -1;
+                modifierDifference = 1;
             break;
     }
 
-    totSemitones = 12*octaveDifference + toneDifference*2 + modifierDifference;
+    totSemitones = 12*octaveDifference*sign + semitoneDifference+ modifierDifference;
 
     return Math.pow(2, (totSemitones / 12))*440;
     // fn = frequency of the note that has a difference of n semitones from A4 (440 Hz)
