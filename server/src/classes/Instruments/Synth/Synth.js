@@ -2,8 +2,8 @@ import Instrument from "../Instrument";
 import {MaxVoices} from "../../../config/SynthConfig";
 import {MaxOscillators} from "../../../config/SynthConfig";
 import EventBus from "../../Input/EventBus";
-import Oscillator from "./Oscillator";
-import {getNoteFrequency} from "../../PianoRoll/NoteData";
+import Oscillator, { WaveShapes } from "./Oscillator";
+import NoteData, {getNoteFrequency} from "../../PianoRoll/NoteData";
 
 export default class Synth extends Instrument {
     constructor() {
@@ -25,18 +25,23 @@ export default class Synth extends Instrument {
         // Creating the oscillators
         for (let i=0; i<4; i++) {
             if (i == 0) {
-                this.oscillators.push(new Oscillator(i, 0.7));
+                this.oscillators.push(new Oscillator(i, 0.25, WaveShapes.Saw));
             }
             else {
-                this.oscillators.push(new Oscillator(i, 0));
+                this.oscillators.push(new Oscillator(i, 0, WaveShapes.Triangle));
             }
         }
         
         this.bindListeners();
+        this.bindMethods();
     }
 
     bindListeners() {
         //EventBus.on()
+    }
+
+    bindMethods() {
+        this.playNote = this.playNote.bind(this);
     }
 
     /** Plays a note
