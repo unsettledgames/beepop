@@ -19,6 +19,7 @@ export const WaveShapes = {
 export default class Oscillator {
     constructor(index, startVolume) {
         this.osc = audioContext.createOscillator();
+        this.osc.type = "sawtooth";
         this.htmlElement = undefined;
         this.oscIndex = index;
 
@@ -53,6 +54,14 @@ export default class Oscillator {
     }
 
     playNote(toPlay) {
+        console.log("Nota: " + toPlay.name);
+        this.osc.frequency.value = toPlay.frequency;
         this.osc.start();
+        setTimeout(this.stopPlaying.bind(this), toPlay.duration);
+    }
+
+    stopPlaying() {
+        console.log("Mi stoppo");
+        this.osc.stop();
     }
 }

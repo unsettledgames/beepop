@@ -11,7 +11,9 @@ export default class App extends React.Component {
     super(props);
 
     const sas = new Synth();
-    //sas.playNote(new NoteData());
+    sas.playNote(new NoteData("C-4", 0, 500, 1));
+    setTimeout(function(){sas.playNote(new NoteData("E-4", 0, 1000, 1))}, 501);
+    setTimeout(function(){sas.playNote(new NoteData("G-4", 0, 1000, 1))}, 1001);
   }
 
   render() {
