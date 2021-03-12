@@ -1,4 +1,4 @@
-import {audioContext} from "../../../consts/Globals";
+import {audioContext as AudioContext} from "../../../consts/Globals";
 
 export const WaveShapes = {
     Sine: "sine",
@@ -27,7 +27,7 @@ export default class Oscillator {
         this.semitoneOffset = 0;
 
         // Gain node
-        this.gainNode = audioContext.createGain();
+        this.gainNode = AudioContext.createGain();
         this.gainNode.gain.value = this.volume;
     }
 
@@ -36,7 +36,23 @@ export default class Oscillator {
         let osc = this.createSetupOscillator(toPlay.frequency);
 
         osc.start();
-        osc.stop(toPlay.duration / 1000);
+        osc.stop(AudioContext.currentTime + toPlay.duration / 1000);
+    }
+
+    startPlayingNote(toPlay) {
+        // BUG: save the notes that are playing in a hash map, so I can stop the right
+        // ones in case I play more than one note at the same time
+        if (this.userKeyboardNote && this.userKeyboardNote === toPlay.name)
+            this.userKeyboardOsc.stop();
+        // Saving the oscillator so I can stop it later
+        this.userKeyboardOsc = this.createSetupOscillator(toPlay.frequency);
+        this.userKeyboardOsc.start();
+        // Saving the note, so that I don't make a mess
+        this.userKeyboardNote = toPlay.name;
+    }
+
+    stopPlaying() {
+        this.userKeyboardOsc.stop();
     }
 
     /** Creates an oscillator and sets it up. No need to recreate nodes, however
@@ -46,7 +62,7 @@ export default class Oscillator {
      * @returns The created oscillator
      */
     createSetupOscillator(freq) {
-        let osc = audioContext.createOscillator();
+        let osc = AudioContext.createOscillator();
 
         osc.volume = this.volume;
         osc.frequency.value = freq;        
@@ -56,7 +72,7 @@ export default class Oscillator {
 
         // ISSUE: every time an oscillator is created, it will probably be necessary
         // to rebuild the sound effect chain in the corresponding mixer track
-        this.gainNode.connect(audioContext.destination);
+        this.gainNode.connect(AudioContext.destination);
 
         return osc;
     }

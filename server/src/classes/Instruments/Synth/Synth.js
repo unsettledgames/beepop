@@ -1,7 +1,7 @@
 import Instrument from "../Instrument";
 import {MaxVoices} from "../../../config/SynthConfig";
 import {MaxOscillators} from "../../../config/SynthConfig";
-import EventBus from "../../Input/EventBus";
+import {EventBus} from "../../Input/EventBus";
 import Oscillator, { WaveShapes } from "./Oscillator";
 import NoteData, {getNoteFrequency} from "../../PianoRoll/NoteData";
 
@@ -31,13 +31,16 @@ export default class Synth extends Instrument {
                 this.oscillators.push(new Oscillator(i, 0, WaveShapes.Triangle));
             }
         }
+
+        this.bindListeners = this.bindListeners.bind(this);
         
         this.bindListeners();
         this.bindMethods();
     }
 
     bindListeners() {
-        //EventBus.on()
+        EventBus.on("synth-start-playing-note", this.startPlayingNote.bind(this));
+        EventBus.on("synth-stop-playing-note", this.stopPlaying.bind(this))
     }
 
     bindMethods() {
@@ -54,8 +57,27 @@ export default class Synth extends Instrument {
         }
     }
 
-    updateOscillatorData(oscIndex) {
+    /** Starts playing a note
+     * 
+     * @param {NoteData} toPlay The data of the note that should be played
+     */
+    startPlayingNote(toPlay) {
+        for (let i=0; i<this.oscillators.length; i++) {
+            this.oscillators[i].startPlayingNote(toPlay);
+        }
+    }
 
+    /** Stops playing the current note
+     * 
+     */
+    stopPlaying() {
+        for (let i=0; i<this.oscillators.length; i++) {
+            this.oscillators[i].stopPlaying();
+        }
+    }
+
+    
+    updateOscillatorData() {
     }
 
     updateLFO(lfoIndex) {
