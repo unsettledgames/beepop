@@ -1,4 +1,5 @@
 import {audioContext} from "../../../consts/Globals";
+import {lerp} from "../../../utilities/MathUtilities";
 
 export const WaveShapes = {
     Sine: "sine",
@@ -48,11 +49,35 @@ export default class Oscillator {
         /*********** SETTING UP THE ENVELOPE *****************/
         // Attack starts from 0
         this.envelopeNode.gain.linearRampToValueAtTime(0,0);
-        // Attack reaches the maximum volume after attackTime 
-        this.envelopeNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + attack / 1000);
 
-        // Decay creates a transition to the sustain value
-        this.envelopeNode.gain.linearRampToValueAtTime(sustain, audioContext.currentTime + (decay + attack) / 1000);
+        // If I have enough time to have that attack time, I apply it 
+        if (currentDuration < toPlay.duration) {
+            // Attack reaches the maximum volume after attackTime 
+            this.envelopeNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + attack / 1000);
+        }
+        // Otherwise, the attack will only reach a certain level (not 1)
+        else {
+            this.envelopeNode.gain.linearRampToValueAtTime(
+                lerp(0, 1, toPlay.duration / attack), 
+                audioContext.currentTime + toPlay.duration / 1000
+            );
+        }
+
+        currentDuration += decay;
+
+        // If I have time to apply decay, I do so
+        if (currentDuration <= toPlay.duration) {
+            // Decay creates a transition to the sustain value
+            this.envelopeNode.gain.linearRampToValueAtTime(sustain, audioContext.currentTime + (decay + attack) / 1000);
+        }
+        // Otherwise, I apply the decay for as long as I can (until the end of the note)
+        else {
+            // BUG:
+            this.envelopeNode.gain.linearRampToValueAtTime(
+                lerp(1, 0, toPlay.duration / currentDuration),
+                audioContext.currentTime + attack + toPlay.duration);
+        }
+        
 
         // Release transitions from sustain to 0
         this.envelopeNode.gain.linearRampToValueAtTime(0, (release + attack + decay) / 1000);

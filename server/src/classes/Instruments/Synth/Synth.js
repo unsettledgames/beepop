@@ -9,9 +9,9 @@ export default class Synth extends Instrument {
         super();
 
         this.attack = 500;
-        this.decay = 0;
+        this.decay = 500;
         this.sustain = 1;
-        this.release = 1000;
+        this.release = 0;
 
         this.arpeggiator = undefined;
         this.oscillators = [];
