@@ -52,10 +52,10 @@ export default class Oscillator {
         this.envelopeNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + attack / 1000);
 
         // Decay creates a transition to the sustain value
-        this.envelopeNode.gain.linearRampToValueAtTime(sustain, audioContext.currentTime + decay / 1000);
+        this.envelopeNode.gain.linearRampToValueAtTime(sustain, audioContext.currentTime + (decay + attack) / 1000);
 
         // Release transitions from sustain to 0
-        //this.envelopeNode.gain.linearRampToValueAtTime(0, release / 1000);
+        this.envelopeNode.gain.linearRampToValueAtTime(0, (release + attack + decay) / 1000);
 
         // Creating a new oscillator with the object properties
         let osc = this.createSetupOscillator(toPlay.frequency);
