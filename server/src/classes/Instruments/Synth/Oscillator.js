@@ -30,13 +30,28 @@ export default class Oscillator {
         this.gainNode = AudioContext.createGain();
         this.gainNode.gain.value = this.volume;
 
+        // Gain node used for the sound envelop
+        this.envelopeNode = AudioContext.createGain();
+
         // User notes (the notes the user is currently playing)
         this.userNotes = {};
     }
 
-    playNote(toPlay) {
-        // Creating a new oscillator (yes, that's how the Audio API work)
+    playNote(toPlay, attack, decay, sustain, release) {
+        // Creating a new oscillator with the object properties
         let osc = this.createSetupOscillator(toPlay.frequency);
+        /*********** SETTING UP THE ENVELOPE *****************/
+        this.envelopeNode.gain.cancelScheduledValues(toPlay.startTime);
+        // Attack starts from 0
+        this.envelopeNode.gain.linearRampToValueAtTime(0, 0);
+        // Attack reaches the maximum volume after attackTime 
+        this.envelopeNode.gain.linearRampToValueAtTime(1, attack);
+
+        // Decay creates a transition to the sustain value
+        this.envelopeNode.gain.linearRampToValueAtTime(sustain, decay);
+
+        // Release transitions from sustain to 0
+        this.envelopeNode.gain.linearRampToValueAtTime(0, release);
 
         osc.start();
         osc.stop(AudioContext.currentTime + toPlay.duration / 1000);

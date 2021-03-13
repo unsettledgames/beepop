@@ -1,5 +1,4 @@
 import Instrument from "../Instrument";
-import {MaxVoices} from "../../../config/SynthConfig";
 import {MaxOscillators} from "../../../config/SynthConfig";
 import {EventBus} from "../../Input/EventBus";
 import Oscillator, { WaveShapes } from "./Oscillator";
@@ -8,9 +7,8 @@ import NoteData, {getNoteFrequency} from "../../PianoRoll/NoteData";
 export default class Synth extends Instrument {
     constructor() {
         super();
-        this.maxVoices = MaxVoices;
 
-        this.attack = 0;
+        this.attack = 500;
         this.decay = 1;
         this.sustain = 1;
         this.release = 0;
@@ -53,7 +51,8 @@ export default class Synth extends Instrument {
      */
     playNote(toPlay) {
         for (let i=0; i<this.oscillators.length; i++) {
-            this.oscillators[i].playNote(toPlay);
+            this.oscillators[i].playNote(toPlay, 
+                this.attack, this.decay, this.sustain, this.release);
         }
     }
 
