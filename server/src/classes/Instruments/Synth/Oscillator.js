@@ -1,4 +1,4 @@
-import {audioContext as AudioContext} from "../../../consts/Globals";
+import {audioContext} from "../../../consts/Globals";
 
 export const WaveShapes = {
     Sine: "sine",
@@ -27,34 +27,41 @@ export default class Oscillator {
         this.semitoneOffset = 0;
 
         // Gain node
-        this.gainNode = AudioContext.createGain();
+        this.gainNode = audioContext.createGain();
         this.gainNode.gain.value = this.volume;
 
         // Gain node used for the sound envelop
-        this.envelopeNode = AudioContext.createGain();
+        this.envelopeNode = audioContext.createGain();
 
         // User notes (the notes the user is currently playing)
         this.userNotes = {};
     }
 
     playNote(toPlay, attack, decay, sustain, release) {
-        // Creating a new oscillator with the object properties
-        let osc = this.createSetupOscillator(toPlay.frequency);
+        /* Used to save the duration of the note, including attack and decay:
+           in that way the note won't get longer as attack and decay increase */
+        let currentDuration = attack;
+
+        // If the attack time is too long, I 
+        //if (currentDuration > toPlay.duration)
+
         /*********** SETTING UP THE ENVELOPE *****************/
-        this.envelopeNode.gain.cancelScheduledValues(toPlay.startTime);
         // Attack starts from 0
-        this.envelopeNode.gain.linearRampToValueAtTime(0, 0);
+        this.envelopeNode.gain.linearRampToValueAtTime(0,0);
         // Attack reaches the maximum volume after attackTime 
-        this.envelopeNode.gain.linearRampToValueAtTime(1, attack);
+        this.envelopeNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + attack / 1000);
 
         // Decay creates a transition to the sustain value
-        this.envelopeNode.gain.linearRampToValueAtTime(sustain, decay);
+        this.envelopeNode.gain.linearRampToValueAtTime(sustain, audioContext.currentTime + decay / 1000);
 
         // Release transitions from sustain to 0
-        this.envelopeNode.gain.linearRampToValueAtTime(0, release);
+        //this.envelopeNode.gain.linearRampToValueAtTime(0, release / 1000);
+
+        // Creating a new oscillator with the object properties
+        let osc = this.createSetupOscillator(toPlay.frequency);
 
         osc.start();
-        osc.stop(AudioContext.currentTime + toPlay.duration / 1000);
+        osc.stop(audioContext.currentTime + (toPlay.duration + release) / 1000);
     }
 
     startPlayingNote(toPlay) {
@@ -78,17 +85,17 @@ export default class Oscillator {
      * @returns The created oscillator
      */
     createSetupOscillator(freq) {
-        let osc = AudioContext.createOscillator();
+        let osc = audioContext.createOscillator();
 
         osc.volume = this.volume;
         osc.frequency.value = freq;        
         osc.type = this.waveform;
 
-        osc.connect(this.gainNode);
+        osc.connect(this.gainNode).connect(this.envelopeNode);
 
         // ISSUE: every time an oscillator is created, it will probably be necessary
         // to rebuild the sound effect chain in the corresponding mixer track
-        this.gainNode.connect(AudioContext.destination);
+        this.envelopeNode.connect(audioContext.destination);
 
         return osc;
     }
