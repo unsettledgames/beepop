@@ -29,6 +29,9 @@ export default class Oscillator {
         // Gain node
         this.gainNode = AudioContext.createGain();
         this.gainNode.gain.value = this.volume;
+
+        // User notes (the notes the user is currently playing)
+        this.userNotes = {};
     }
 
     playNote(toPlay) {
@@ -42,17 +45,15 @@ export default class Oscillator {
     startPlayingNote(toPlay) {
         // BUG: save the notes that are playing in a hash map, so I can stop the right
         // ones in case I play more than one note at the same time
-        if (this.userKeyboardNote && this.userKeyboardNote === toPlay.name)
-            this.userKeyboardOsc.stop();
+        if (this.userNotes[toPlay.name])
+            this.userNotes[toPlay.name].stop();
         // Saving the oscillator so I can stop it later
-        this.userKeyboardOsc = this.createSetupOscillator(toPlay.frequency);
-        this.userKeyboardOsc.start();
-        // Saving the note, so that I don't make a mess
-        this.userKeyboardNote = toPlay.name;
+        this.userNotes[toPlay.name] = this.createSetupOscillator(toPlay.frequency);
+        this.userNotes[toPlay.name].start();
     }
 
-    stopPlaying() {
-        this.userKeyboardOsc.stop();
+    stopPlaying(toStop) {
+        this.userNotes[toStop.name].stop();
     }
 
     /** Creates an oscillator and sets it up. No need to recreate nodes, however

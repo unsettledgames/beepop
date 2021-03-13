@@ -70,9 +70,9 @@ export default class Synth extends Instrument {
     /** Stops playing the current note
      * 
      */
-    stopPlaying() {
+    stopPlaying(note) {
         for (let i=0; i<this.oscillators.length; i++) {
-            this.oscillators[i].stopPlaying();
+            this.oscillators[i].stopPlaying(note);
         }
     }
 
