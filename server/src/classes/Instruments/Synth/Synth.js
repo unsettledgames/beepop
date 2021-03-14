@@ -1,5 +1,6 @@
 import Instrument from "../Instrument";
 import {MaxOscillators} from "../../../config/SynthConfig";
+import Envelope from "./Envelope";
 import {EventBus} from "../../Input/EventBus";
 import Oscillator, { WaveShapes } from "./Oscillator";
 import NoteData, {getNoteFrequency} from "../../PianoRoll/NoteData";
@@ -8,10 +9,15 @@ export default class Synth extends Instrument {
     constructor() {
         super();
 
-        this.attack = 0;
-        this.decay = 0;
-        this.sustain = 1;
-        this.release = 500;
+        let defaultEnvelope = {
+            attack: 0, decay: 0, sustain: 0, release: 0, duration: 1
+        };
+
+        this.leftEnvelope = new Envelope("gain");
+        this.rightEnvelope = new Envelope("gain");
+
+        this.leftEnvelope.updateEnvelope(defaultEnvelope);
+        this.rightEnvelope.updateEnvelope(defaultEnvelope);
 
         this.arpeggiator = undefined;
         this.oscillators = [];
@@ -29,6 +35,13 @@ export default class Synth extends Instrument {
                 this.oscillators.push(new Oscillator(i, 0, WaveShapes.Triangle));
             }
         }
+
+        // Connecting the first 2 oscillators to the first envelope
+        this.oscillators[0].envelopeNode = this.leftEnvelope;
+        this.oscillators[1].envelopeNode = this.leftEnvelope;
+
+        this.oscillators[2].envelopeNode = this.rightEnvelope;
+        this.oscillators[3].envelopeNode = this.rightEnvelope;
 
         this.bindListeners = this.bindListeners.bind(this);
         
@@ -50,9 +63,13 @@ export default class Synth extends Instrument {
      * @param {NoteData} toPlay The data of the note that should be played
      */
     playNote(toPlay) {
+        let envelopeObject = {duration: toPlay.duration};
+
+        this.leftEnvelope.updateEnvelope(envelopeObject);
+        this.rightEnvelope.updateEnvelope(envelopeObject);
+
         for (let i=0; i<this.oscillators.length; i++) {
-            this.oscillators[i].playNote(toPlay, 
-                this.attack, this.decay, this.sustain, this.release);
+            this.oscillators[i].playNote(toPlay, this.leftEnvelope.release);
         }
     }
 
@@ -77,6 +94,7 @@ export default class Synth extends Instrument {
 
     
     updateOscillatorData() {
+
     }
 
     updateLFO(lfoIndex) {

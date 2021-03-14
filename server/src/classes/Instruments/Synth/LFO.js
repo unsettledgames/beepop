@@ -1,4 +1,4 @@
-import {WaveShapes} from "../Instruments/Synth/Oscillator"
+import {WaveShapes} from "./Oscillator"
 
 export default class LFO {
     constructor() {
