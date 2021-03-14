@@ -10,7 +10,7 @@ export default class Synth extends Instrument {
 
         this.attack = 500;
         this.decay = 500;
-        this.sustain = 1;
+        this.sustain = 0
         this.release = 0;
 
         this.arpeggiator = undefined;

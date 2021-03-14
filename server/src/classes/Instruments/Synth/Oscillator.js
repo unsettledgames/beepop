@@ -72,10 +72,9 @@ export default class Oscillator {
         }
         // Otherwise, I apply the decay for as long as I can (until the end of the note)
         else {
-            // BUG:
             this.envelopeNode.gain.linearRampToValueAtTime(
-                lerp(1, 0, toPlay.duration / currentDuration),
-                audioContext.currentTime + attack + toPlay.duration);
+                lerp(1, 0, (toPlay.duration - attack) / decay),
+                audioContext.currentTime + toPlay.duration);
         }
         
 

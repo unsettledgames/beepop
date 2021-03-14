@@ -12,7 +12,7 @@ export default class App extends React.Component {
     super(props);
 
     const sas = new Synth();
-    sas.playNote(new NoteData("E-4", 0, 1000));
+    sas.playNote(new NoteData("E-4", 0, 900));
   }
 
   render() {
