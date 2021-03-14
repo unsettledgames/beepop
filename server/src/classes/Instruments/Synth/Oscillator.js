@@ -42,13 +42,15 @@ export default class Oscillator {
         /* Used to save the duration of the note, including attack and decay:
            in that way the note won't get longer as attack and decay increase */
         let currentDuration = attack;
+        // If attack or decay are too high, the note may not reach the expected sustain value
+        let appliedSustain;
 
         // If the attack time is too long, I 
         //if (currentDuration > toPlay.duration)
 
         /*********** SETTING UP THE ENVELOPE *****************/
         // Attack starts from 0
-        this.envelopeNode.gain.linearRampToValueAtTime(0,0);
+        this.envelopeNode.gain.linearRampToValueAtTime(audioContext.currentTime, 0);
 
         // If I have enough time to have that attack time, I apply it 
         if (currentDuration < toPlay.duration) {
@@ -61,6 +63,8 @@ export default class Oscillator {
                 lerp(0, 1, toPlay.duration / attack), 
                 audioContext.currentTime + toPlay.duration / 1000
             );
+
+            appliedSustain = lerp(0, 1, toPlay.duration / attack);
         }
 
         currentDuration += decay;
@@ -69,22 +73,28 @@ export default class Oscillator {
         if (currentDuration <= toPlay.duration) {
             // Decay creates a transition to the sustain value
             this.envelopeNode.gain.linearRampToValueAtTime(sustain, audioContext.currentTime + (decay + attack) / 1000);
+            appliedSustain = sustain;
         }
         // Otherwise, I apply the decay for as long as I can (until the end of the note)
         else {
             this.envelopeNode.gain.linearRampToValueAtTime(
                 lerp(1, 0, (toPlay.duration - attack) / decay),
-                audioContext.currentTime + toPlay.duration);
+                audioContext.currentTime + (toPlay.duration) / 1000);
+            
+            appliedSustain = lerp(1, 0, (toPlay.duration - attack) / decay);
         }
-        
 
-        // Release transitions from sustain to 0
-        this.envelopeNode.gain.linearRampToValueAtTime(0, (release + attack + decay) / 1000);
+        // Release starts from the applied sustain value
+        this.envelopeNode.gain.linearRampToValueAtTime(appliedSustain,
+            audioContext.currentTime + (toPlay.duration) / 1000);
+        // And slides towards 0 as soon as the note is over
+        this.envelopeNode.gain.linearRampToValueAtTime(0,
+                audioContext.currentTime + (toPlay.duration + release) / 1000);
 
         // Creating a new oscillator with the object properties
         let osc = this.createSetupOscillator(toPlay.frequency);
 
-        osc.start();
+        osc.start(audioContext.currentTime);
         osc.stop(audioContext.currentTime + (toPlay.duration + release) / 1000);
     }
 
@@ -94,6 +104,7 @@ export default class Oscillator {
         if (this.userNotes[toPlay.name])
             this.userNotes[toPlay.name].stop();
         // Saving the oscillator so I can stop it later
+        this.envelopeNode.gain.value = 1;
         this.userNotes[toPlay.name] = this.createSetupOscillator(toPlay.frequency);
         this.userNotes[toPlay.name].start();
     }

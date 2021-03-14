@@ -3,5 +3,5 @@ export function clamp(num, min, max) {
 }
 
 export function lerp(min, max, t) {
-    return clamp(min + (max - min) * t, min, max);
+    return min * (1 - t) + max * t;
 }
